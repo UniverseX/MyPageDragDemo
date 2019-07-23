@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="more_app_item_width">184dp</dimen>
+    <dimen name="more_app_item_height">200dp</dimen>
+    <dimen name="more_app_divider_padding_y">10dp</dimen>
+    <dimen name="more_app_divider_padding_x">6dp</dimen>
+</resources>
