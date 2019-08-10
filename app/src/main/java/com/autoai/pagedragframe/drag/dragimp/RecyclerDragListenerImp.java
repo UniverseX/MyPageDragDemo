@@ -7,10 +7,9 @@ import android.support.v7.widget.RecyclerView;
 import android.view.MotionEvent;
 import android.view.View;
 
-
 import com.autoai.pagedragframe.drag.DragInfo;
-import com.autoai.pagedragframe.drag.DragNotifier;
 import com.autoai.pagedragframe.drag.DragListenerDispatcher;
+import com.autoai.pagedragframe.drag.DragNotifier;
 
 import java.util.Objects;
 
@@ -129,18 +128,28 @@ public class RecyclerDragListenerImp extends DragListenerDispatcher<RecyclerView
                                 }
                             });
                         } else {
-                            notifier.onDragEnd(notifier.getPositionForId(itemId), dragInfo.draggingView);
-                            dragInfo.reset();
+                            recyclerView.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    notifier.onDragEnd(notifier.getPositionForId(itemId), dragInfo.draggingView);
+                                    dragInfo.reset();
+                                }
+                            });
                         }
                     }
                 });
     }
+
 
     @Override
     public void onDragOver(DragInfo dragInfo, final RecyclerView recyclerView) {
         final long itemId = dragInfo.itemId;
         final float x = dragInfo.dragX;
         final float y = dragInfo.dragY;
+
+//        final float x = dragInfo.dragX - dragInfo.shadowTouchPoint.x + dragInfo.shadowSize.x / 2f;
+//        final float y = dragInfo.dragY - dragInfo.shadowTouchPoint.y + dragInfo.shadowSize.y / 2f;
+
         int fromPosition = notifier.getPositionForId(itemId);
         int toPosition = -1;
 

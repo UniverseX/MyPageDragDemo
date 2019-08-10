@@ -1,19 +1,17 @@
 package com.autoai.pagedragframe.viewpager;
 
 import android.content.Context;
+import android.support.annotation.CallSuper;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
 
 import java.util.ArrayList;
 import java.util.List;
 
-/*
-todo recycle page items
- */
 public abstract class BaseGridPagerAdapter<V> extends BasePagerAdapter<RecyclerView, V> {
     private final int mRow;
     private final int mColumn;
@@ -22,17 +20,17 @@ public abstract class BaseGridPagerAdapter<V> extends BasePagerAdapter<RecyclerV
         super(context, list);
         mRow = row;
         mColumn = column;
-        updatePageData(list);
+        updateAllPageData(list);
     }
 
     @Override
-    public void updateAll(List<V> list){
-        updatePageData(list);
+    public void reCreateAllPages(List<V> list){
+        updateAllPageData(list);
 
-        super.updateAll(list);
+        super.reCreateAllPages(list);
     }
 
-    protected void updatePageData(List<V> list) {
+    protected void updateAllPageData(List<V> list) {
         mPageData.clear();
         int pageNum = getPageNum(list);
         for (int i = 0; i < pageNum; i++) {
@@ -56,17 +54,12 @@ public abstract class BaseGridPagerAdapter<V> extends BasePagerAdapter<RecyclerV
         List<V> allData = getAllData();
         V remove = allData.remove(fromListIndex);
         allData.add(toListIndex, remove);
-        updatePageData(allData);
+        updateAllPageData(allData);
     }
 
     @Override
     public RecyclerView onCreatePage(ViewGroup parent) {
         return new RecyclerView(parent.getContext());
-    }
-
-    @Override
-    public FrameLayout.LayoutParams generatePageLayoutParams() {
-        return new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
     }
 
     @Override
@@ -76,7 +69,44 @@ public abstract class BaseGridPagerAdapter<V> extends BasePagerAdapter<RecyclerV
     }
 
     protected RecyclerView.LayoutManager getLayoutManager(Context context) {
-        return new GridLayoutManager(context, mColumn, LinearLayoutManager.VERTICAL, false);
+        return new NoVerticalGridManager(context, mColumn, LinearLayoutManager.VERTICAL, false);
+    }
+
+    private class NoVerticalGridManager extends GridLayoutManager {
+
+        public NoVerticalGridManager(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
+            super(context, attrs, defStyleAttr, defStyleRes);
+            setRecycleChildrenOnDetach(true);
+        }
+
+        public NoVerticalGridManager(Context context, int spanCount) {
+            super(context, spanCount);
+            setRecycleChildrenOnDetach(true);
+        }
+
+        public NoVerticalGridManager(Context context, int spanCount, int orientation, boolean reverseLayout) {
+            super(context, spanCount, orientation, reverseLayout);
+            setRecycleChildrenOnDetach(true);
+        }
+
+        @Override
+        public boolean canScrollVertically() {
+            return false;
+        }
+    }
+
+    @Override
+    public void release() {
+        int pageNum = getPageNum();
+        for (int i = 0; i < pageNum; i++) {
+            RecyclerView page = getPage(i);
+            RecyclerView.LayoutManager layoutManager = page.getLayoutManager();
+            if(layoutManager instanceof LinearLayoutManager){
+                ((LinearLayoutManager) layoutManager).setRecycleChildrenOnDetach(false);
+            }
+        }
+
+        super.release();
     }
 
     protected abstract GridRecycleAdapter generateItemAdapter(List<V> data, int pageIndex);
@@ -91,15 +121,16 @@ public abstract class BaseGridPagerAdapter<V> extends BasePagerAdapter<RecyclerV
     }
 
     @Override
-    protected List<V> getAllData() {
+    public List<V> getAllData() {
         ArrayList<V> vs = new ArrayList<>();
-        for (int i = 0; i < mPageData.size(); i++) {
+        final int size = mPageData.size();
+        for (int i = 0; i < size; i++) {
             vs.addAll(mPageData.get(i));
         }
         return vs;
     }
 
-    public void reBindPages(){
+    public void reBindAllPage(){
         for (int i = 0; i < getCount(); i++) {
             notifyPageChanged(i);
         }
@@ -109,7 +140,7 @@ public abstract class BaseGridPagerAdapter<V> extends BasePagerAdapter<RecyclerV
         if(pageIndex < 0 || pageIndex >= getCount()){
             return;
         }
-        RecyclerView recyclerView = (RecyclerView) getPage(pageIndex).getChildAt(0);
+        RecyclerView recyclerView = getPage(pageIndex);
         if(recyclerView.getAdapter() != null){
             GridRecycleAdapter adapter = (GridRecycleAdapter) recyclerView.getAdapter();
             adapter.updateData(getPageInfo(pageIndex));
@@ -121,6 +152,67 @@ public abstract class BaseGridPagerAdapter<V> extends BasePagerAdapter<RecyclerV
         return mColumn * mRow;
     }
 
+    @CallSuper
+    public void addPageData(V v){
+        List<V> lastPageList = mPageData.get(mPageData.size() - 1);
+        if(lastPageList.size() == getPageContentSize()){
+            //prepare data
+            ArrayList<V> newPageList = new ArrayList<>();
+            newPageList.add(v);
+            mPageData.add(newPageList);
+            //create and add page
+            addPage(createPage(getPage(0).getContext()));
+        }else {
+            lastPageList.add(v);
+
+            RecyclerView recyclerView = getPage(mPageData.size() - 1);
+            if(recyclerView.getAdapter() != null){
+                GridRecycleAdapter adapter = (GridRecycleAdapter) recyclerView.getAdapter();
+                adapter.updateData(lastPageList);
+                adapter.notifyItemInserted(lastPageList.size() - 1);
+            }
+        }
+    }
+
+    @CallSuper
+    public void removePageData(V v){
+        int oldPageNum = getPageNum();
+        List<V> allData = getAllData();
+        boolean result = allData.remove(v);
+        if(result) {
+            updateAllPageData(allData);
+            if(oldPageNum != getPageNum()){
+                //del page
+                removePage(oldPageNum - 1);
+            }else {
+                reBindAllPage();
+            }
+        }
+    }
+
+    @CallSuper
+    public void updatePageData(V v){
+        List<V> allData = getAllData();
+        int pageContentSize = getPageContentSize();
+        for (int i = 0; i < allData.size(); i++) {
+            if(updateEqualJudge(allData.get(i), v)){
+                int pageIndex = i / pageContentSize;
+                int pageInnerPosition = i % pageContentSize;
+                RecyclerView page = getPage(pageIndex);
+                RecyclerView.Adapter adapter = page.getAdapter();
+                if(adapter != null){
+                    adapter.notifyItemChanged(pageInnerPosition);
+                }
+                return;
+            }
+        }
+    }
+
+    protected boolean updateEqualJudge(V v, V v1) {
+        return v == v1;
+    }
+
+
     public List<V> getPageInfo(int pageIndex) {
         return mPageData.get(pageIndex);
     }
@@ -129,7 +221,7 @@ public abstract class BaseGridPagerAdapter<V> extends BasePagerAdapter<RecyclerV
         int startIndex = pageIndex * getPageContentSize();
         int pageNum = getPageNum(vList);
         int endInfoIndex = (pageIndex == pageNum - 1) ? vList.size() : (pageIndex + 1) * getPageContentSize();
-        return vList.subList(startIndex, endInfoIndex);
+        return new ArrayList<>(vList.subList(startIndex, endInfoIndex));
     }
 
     public int transToDataListIndex(int pageIndex, int childIndex) {
@@ -169,6 +261,10 @@ public abstract class BaseGridPagerAdapter<V> extends BasePagerAdapter<RecyclerV
 
         public List<V> getData() {
             return new ArrayList<>(data);
+        }
+
+        public V getValue(int position){
+            return data.get(position);
         }
 
         @Override

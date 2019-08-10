@@ -1,9 +1,9 @@
 package com.autoai.pagedragframe.viewpager;
 
 import android.content.Context;
+import android.support.annotation.CallSuper;
 import android.support.annotation.NonNull;
 import android.support.v4.view.PagerAdapter;
-import android.support.v4.view.ViewPager;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
@@ -12,7 +12,7 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class BasePagerAdapter<Page extends View, Value> extends PagerAdapter implements ViewPager.OnPageChangeListener {
+public abstract class BasePagerAdapter<Page extends View, Value> extends PagerAdapter {
 
     private List<ViewGroup> pages = new ArrayList<>();
 
@@ -36,7 +36,7 @@ public abstract class BasePagerAdapter<Page extends View, Value> extends PagerAd
         return pages.size();
     }
 
-    public void updateAll(List<Value> list){
+    public void reCreateAllPages(List<Value> list){
         mData.clear();
         pages.clear();
         //remove views
@@ -69,6 +69,12 @@ public abstract class BasePagerAdapter<Page extends View, Value> extends PagerAd
     @Override
     public void destroyItem(@NonNull ViewGroup container, int position, @NonNull Object object) {
         container.removeView((View) object);
+        if(object instanceof ViewGroup && ((ViewGroup) object).getChildCount() > 0) {
+            View childAt = ((ViewGroup) object).getChildAt(0);
+            if (childAt instanceof ViewGroup) {
+                onUnbindPage((Page)childAt);
+            }
+        }
     }
 
     @Override
@@ -83,7 +89,7 @@ public abstract class BasePagerAdapter<Page extends View, Value> extends PagerAd
         }
     }
 
-    private FrameLayout createPage(Context context) {
+    protected FrameLayout createPage(Context context) {
         FrameLayout frameLayout = new FrameLayout(context);
         Page page = onCreatePage(frameLayout);
         frameLayout.addView(page, generatePageLayoutParams());
@@ -104,12 +110,14 @@ public abstract class BasePagerAdapter<Page extends View, Value> extends PagerAd
      */
     public abstract void onBindPage(Context context, Page page, int pageIndex);
 
+    public void onUnbindPage(Page view){}
+
     protected List<Value> getAllData() {
         return mData;
     }
 
-    public ViewGroup getPage(int index) {
-        return pages.get(index);
+    public Page getPage(int index) {
+        return (Page) pages.get(index).getChildAt(0);
     }
 
     public int getPageNum() {
@@ -119,11 +127,17 @@ public abstract class BasePagerAdapter<Page extends View, Value> extends PagerAd
     public void addPage(ViewGroup page) {
         pages.add(page);
         notifyDataSetChanged();
+        if(pagesUpdateListener != null){
+            pagesUpdateListener.onPageAdded(pages.size() - 1);
+        }
     }
 
-    public void removePage(ViewGroup page) {
-        if(pages.remove(page)) {
+    public void removePage(int pageIndex) {
+        if(pages.remove(pageIndex) != null){
             notifyDataSetChanged();
+            if(pagesUpdateListener != null){
+                pagesUpdateListener.onPageRemoved();
+            }
         }
     }
 
@@ -136,20 +150,18 @@ public abstract class BasePagerAdapter<Page extends View, Value> extends PagerAd
         notifyDataSetChanged();
     }
 
+    @CallSuper
     public void release() {
-//        observers.clear();
         emptyPages();
     }
 
-/*
-    // TODO: 19-7-23 data observers
-    private List<DataSetObserver<Value>> observers = new ArrayList<>();
-
-    public void registerDataObserver(@NonNull DataSetObserver<Value> observer){
-        observers.add(observer);
+    public interface OnPagesUpdateListener {
+        void onPageAdded(int pageIndex);
+        void onPageRemoved();
     }
+    private OnPagesUpdateListener pagesUpdateListener;
 
-    public void unregisterDataObserver(DataSetObserver<Value> observer){
-        observers.remove(observer);
-    }*/
+    public void setOnPageChangeListener(OnPagesUpdateListener pagesUpdateListener){
+        this.pagesUpdateListener = pagesUpdateListener;
+    }
 }

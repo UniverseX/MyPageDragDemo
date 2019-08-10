@@ -74,6 +74,7 @@ public abstract class BaseDragPageAdapter<V> extends BaseGridPagerAdapter<V> imp
             super.onBindViewHolder(holder, position);
             long draggingId = getDraggingId(mPageIndex);
             holder.itemView.setVisibility(draggingId == getItemId(position) ? View.INVISIBLE : View.VISIBLE);
+            holder.itemView.setAlpha(draggingId == getItemId(position) ? 0f : 1f);
             holder.itemView.postInvalidate();
         }
 
@@ -109,7 +110,7 @@ public abstract class BaseDragPageAdapter<V> extends BaseGridPagerAdapter<V> imp
             if(fromPosition == toPosition){
                 return;
             }
-            //按顺序交换，不直接交换
+            //按顺序交换，不直接交换,do not use Collections.swap, ensure the order
             List<V> data = getData();
             V removeItem = data.remove(fromPosition);
             data.add(toPosition, removeItem);
@@ -132,26 +133,13 @@ public abstract class BaseDragPageAdapter<V> extends BaseGridPagerAdapter<V> imp
         }
 
         public int getPageChildIndexById(int pageIndex, long itemId){
-            RecyclerView recyclerView = (RecyclerView) getPage(pageIndex).getChildAt(0);
+            RecyclerView recyclerView = getPage(pageIndex);
             if(recyclerView.getAdapter() != null){
                 DragAdapter adapter = (DragAdapter) recyclerView.getAdapter();
                 return transToDataListIndex(pageIndex, adapter.getPositionForId(itemId));
             }
             return RecyclerView.NO_POSITION;
         }
-    }
-
-    @Override
-    public void onPageScrolled(int i, float v, int i1) {
-    }
-
-    @Override
-    public void onPageSelected(int i) {
-    }
-
-    @Override
-    public void onPageScrollStateChanged(int i) {
-
     }
 
     public void setItemOnLongClickListener(View.OnLongClickListener listener) {

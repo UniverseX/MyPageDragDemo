@@ -24,7 +24,13 @@ public class ListInvocationHandler<E> implements InvocationHandler {
 
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-        Object invoke = method.invoke(list, args);//maybe has some exception e.g. method is native
+        Object invoke = null;
+        try {
+            method.setAccessible(true);
+            invoke = method.invoke(list, args);
+        }catch (Exception e){
+        }
+
 
         if (valueClazz == null) {
             if (list.size() > 0) {

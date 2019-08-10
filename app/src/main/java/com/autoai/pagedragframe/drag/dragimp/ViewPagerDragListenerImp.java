@@ -1,5 +1,6 @@
 package com.autoai.pagedragframe.drag.dragimp;
 
+import android.content.res.Resources;
 import android.graphics.PointF;
 import android.os.Handler;
 import android.support.annotation.Nullable;
@@ -12,8 +13,6 @@ import com.autoai.pagedragframe.drag.BaseDragPageAdapter;
 import com.autoai.pagedragframe.drag.DragInfo;
 import com.autoai.pagedragframe.drag.DragListenerDispatcher;
 
-
-// TODO: 19-7-19 被RecyclerView覆盖 无法接受到location信息
 public class ViewPagerDragListenerImp extends DragListenerDispatcher<ViewPager, DragInfo> {
     private static final String TAG = "ViewPagerDragListener";
     private static final int SCROLL_DELAY = 600;
@@ -31,14 +30,22 @@ public class ViewPagerDragListenerImp extends DragListenerDispatcher<ViewPager, 
     private int rightOutZone;
     private boolean mDragging;
     private DragListenerDispatcher mLastDragLisener;
-    int mScrollState = SCROLL_OUTSIDE_ZONE;
+    private int mScrollState = SCROLL_OUTSIDE_ZONE;
+    private int shadowSizeX = 0;
 
     public ViewPagerDragListenerImp(ViewPager viewPager) {
         super(viewPager);
         mHandler = new Handler();
-        leftOutZone = 100;
-        rightOutZone = 100;
+        leftOutZone = rightOutZone = (int) (Resources.getSystem().getDisplayMetrics().density * 100);
         mScrollRunnable = new ScrollRunnable(viewPager);
+    }
+
+    public void setLeftOutZone(int leftOutZone) {
+        this.leftOutZone = leftOutZone;
+    }
+
+    public void setRightOutZone(int rightOutZone) {
+        this.rightOutZone = rightOutZone;
     }
 
     @Override
@@ -52,7 +59,15 @@ public class ViewPagerDragListenerImp extends DragListenerDispatcher<ViewPager, 
 
         mLastDragLisener = null;
 
-        if ((dragInfo.dragX < leftOutZone) || (dragInfo.dragX > viewPager.getWidth() - rightOutZone)) {
+        shadowSizeX = dragInfo.shadowSize.x;
+
+        final float x = dragInfo.dragX;
+        final float y = dragInfo.dragY;
+
+        final float visualCenterX = x - dragInfo.shadowTouchPoint.x + dragInfo.shadowSize.x / 2f;
+//        final float visualCenterY = y - dragInfo.shadowTouchPoint.y + dragInfo.shadowSize.y / 2f;
+
+        if (((visualCenterX - shadowSizeX / 4f) < leftOutZone) || ((visualCenterX + shadowSizeX / 4f) > viewPager.getWidth() - rightOutZone)) {
             mScrollState = SCROLL_WAITING_IN_ZONE;
             mHandler.postDelayed(mScrollRunnable, SCROLL_DELAY);
         } else {
@@ -117,13 +132,18 @@ public class ViewPagerDragListenerImp extends DragListenerDispatcher<ViewPager, 
 
         checkTouchMove(dragInfo, viewPager);
 
+        shadowSizeX = dragInfo.shadowSize.x;
+
         final float x = dragInfo.dragX;
         final float y = dragInfo.dragY;
+
+        final float visualCenterX = x - dragInfo.shadowTouchPoint.x + dragInfo.shadowSize.x / 2f;
+        final float visualCenterY = y - dragInfo.shadowTouchPoint.y + dragInfo.shadowSize.y / 2f;
         // Check if we are hovering over the scroll areas
-        mDistanceSinceScroll += Math.hypot(mLastTouch[0] - x, mLastTouch[1] - y);
-        mLastTouch[0] = (int) x;
-        mLastTouch[1] = (int) y;
-        checkScrollState(viewPager, x, y);
+        mDistanceSinceScroll += Math.hypot(mLastTouch[0] - visualCenterX, mLastTouch[1] - visualCenterY);
+        mLastTouch[0] = (int) visualCenterX;
+        mLastTouch[1] = (int) visualCenterY;
+        checkScrollState(viewPager, visualCenterX, visualCenterY, shadowSizeX);
     }
 
     private void checkTouchMove(final DragInfo dragInfo, ViewPager viewPager) {
@@ -177,16 +197,16 @@ public class ViewPagerDragListenerImp extends DragListenerDispatcher<ViewPager, 
         mLastDragLisener = dragListener;
     }
 
-    private void checkScrollState(final ViewPager viewPager, float x, float y) {
+    private void checkScrollState(final ViewPager viewPager, float x, float y, float shadowSize) {
         final int slop = ViewConfiguration.get(viewPager.getContext()).getScaledWindowTouchSlop();
         final int delay = mDistanceSinceScroll < slop ? RESCROLL_DELAY : SCROLL_DELAY;
-        if (x < leftOutZone) {//Turn to the left page
+        if ((x - shadowSize /4f) < leftOutZone) {//Turn to the left page
             if (mScrollState == SCROLL_OUTSIDE_ZONE) {
                 mScrollState = SCROLL_WAITING_IN_ZONE;
                 mScrollRunnable.setDirection(SCROLL_LEFT);
                 mHandler.postDelayed(mScrollRunnable, delay);
             }
-        } else if (x > viewPager.getWidth() - rightOutZone) {
+        } else if ((x + shadowSize /4f) > viewPager.getWidth() - rightOutZone) {
             if (mScrollState == SCROLL_OUTSIDE_ZONE) {
                 mScrollState = SCROLL_WAITING_IN_ZONE;
                 mScrollRunnable.setDirection(SCROLL_RIGHT);
@@ -207,7 +227,7 @@ public class ViewPagerDragListenerImp extends DragListenerDispatcher<ViewPager, 
 
     private ScrollRunnable mScrollRunnable;
 
-    private class ScrollRunnable implements Runnable {//todo weakRunnable
+    private class ScrollRunnable implements Runnable {
         private int mDirection;
         private ViewPager viewPager;
 
@@ -227,7 +247,7 @@ public class ViewPagerDragListenerImp extends DragListenerDispatcher<ViewPager, 
             mDistanceSinceScroll = 0;
             if (isDragging()) {
                 // Check the scroll again so that we can requeue the scroller if necessary
-                checkScrollState(viewPager, mLastTouch[0], mLastTouch[1]);
+                checkScrollState(viewPager, mLastTouch[0], mLastTouch[1], shadowSizeX);
             }
         }
 
@@ -273,6 +293,6 @@ public class ViewPagerDragListenerImp extends DragListenerDispatcher<ViewPager, 
             return null;
         }
         BaseDragPageAdapter dragPageAdapter = (BaseDragPageAdapter) viewPager.getAdapter();
-        return dragPageAdapter.getPage(pageIndex).getChildAt(0);
+        return dragPageAdapter.getPage(pageIndex);
     }
 }
