@@ -17,10 +17,14 @@ public class DragManager<V extends View> {
             PointF touchPoint = dragListener.getLastTouchPoint();
             int x = (int) (touchPoint.x - itemView.getX());
             int y = (int) (touchPoint.y - itemView.getY());
-            startDrag(itemView, dragInfo, new NoForegroundShadowBuilder(itemView, new Point(x, y)));
+            startDrag(itemView, dragInfo, getViewShadowBuilder(itemView, new Point(x, y)));
         }else {
             startDrag(itemView, dragInfo, null);
         }
+    }
+
+    public View.DragShadowBuilder getViewShadowBuilder(View view, Point touchPoint){
+        return new NoForegroundShadowBuilder(view, touchPoint);
     }
 
     public void startDrag(View itemView, DragInfo dragInfo, View.DragShadowBuilder dragShadowBuilder) {

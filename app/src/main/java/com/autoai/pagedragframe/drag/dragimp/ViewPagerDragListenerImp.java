@@ -40,6 +40,10 @@ public class ViewPagerDragListenerImp extends DragListenerDispatcher<ViewPager, 
         mScrollRunnable = new ScrollRunnable(viewPager);
     }
 
+    public void release(){
+        mScrollRunnable.release();
+    }
+
     public void setLeftOutZone(int leftOutZone) {
         this.leftOutZone = leftOutZone;
     }
@@ -233,6 +237,10 @@ public class ViewPagerDragListenerImp extends DragListenerDispatcher<ViewPager, 
 
         ScrollRunnable(ViewPager viewPager) {
             this.viewPager = viewPager;
+        }
+
+        public void release(){
+            viewPager = null;
         }
 
         public void run() {

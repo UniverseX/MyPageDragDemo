@@ -72,7 +72,7 @@ public abstract class BasePagerAdapter<Page extends View, Value> extends PagerAd
         if(object instanceof ViewGroup && ((ViewGroup) object).getChildCount() > 0) {
             View childAt = ((ViewGroup) object).getChildAt(0);
             if (childAt instanceof ViewGroup) {
-                onUnbindPage((Page)childAt);
+                onUnbindPage((Page)childAt, position);
             }
         }
     }
@@ -110,7 +110,7 @@ public abstract class BasePagerAdapter<Page extends View, Value> extends PagerAd
      */
     public abstract void onBindPage(Context context, Page page, int pageIndex);
 
-    public void onUnbindPage(Page view){}
+    public void onUnbindPage(Page view, int pageIndex){}
 
     protected List<Value> getAllData() {
         return mData;
@@ -122,6 +122,10 @@ public abstract class BasePagerAdapter<Page extends View, Value> extends PagerAd
 
     public int getPageNum() {
         return mData.size();
+    }
+
+    public final int getPageSize(){
+        return pages.size();
     }
 
     public void addPage(ViewGroup page) {
@@ -152,7 +156,12 @@ public abstract class BasePagerAdapter<Page extends View, Value> extends PagerAd
 
     @CallSuper
     public void release() {
+        mContextRef.clear();
         emptyPages();
+    }
+
+    public void setContext(Context context){
+        mContextRef = new WeakReference<>(context);
     }
 
     public interface OnPagesUpdateListener {

@@ -3,6 +3,7 @@ package com.autoai.pagedragframe;
 import android.content.Context;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -47,8 +48,9 @@ public class GridPagerAdapter extends BaseDragPageAdapter<TestBean> {
 
         @Override
         public PageViewHolder onCreateViewHolder(ViewGroup parent, int viewType, int pageIndex) {
-            // TODO: 19-7-17  无父布局的View 不显示item 图像
-            return new PageViewHolder(View.inflate(parent.getContext(), R.layout.page_item, null), pageIndex);
+            View inflate = LayoutInflater.from(parent.getContext()).inflate(R.layout.page_item, parent, false);
+
+            return new PageViewHolder(inflate, pageIndex);
         }
 
         @Override

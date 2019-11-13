@@ -26,11 +26,15 @@ public class DragSortShadowBuilder extends View.DragShadowBuilder {
 
     public static final String TAG = DragSortShadowBuilder.class.getSimpleName();
 
-    final Point touchPoint = new Point();
+    private final Point touchPoint = new Point();
 
     public DragSortShadowBuilder(View view, Point touchPoint) {
         super(view);
         this.touchPoint.set(touchPoint.x, touchPoint.y);
+    }
+
+    public Point getTouchPoint() {
+        return touchPoint;
     }
 
     @Override

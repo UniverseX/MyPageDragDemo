@@ -97,12 +97,14 @@ public abstract class BaseGridPagerAdapter<V> extends BasePagerAdapter<RecyclerV
 
     @Override
     public void release() {
-        int pageNum = getPageNum();
-        for (int i = 0; i < pageNum; i++) {
-            RecyclerView page = getPage(i);
-            RecyclerView.LayoutManager layoutManager = page.getLayoutManager();
-            if(layoutManager instanceof LinearLayoutManager){
-                ((LinearLayoutManager) layoutManager).setRecycleChildrenOnDetach(false);
+        if(getPageSize() > 0) {
+            int pageNum = getPageNum();
+            for (int i = 0; i < pageNum; i++) {
+                RecyclerView page = getPage(i);
+                RecyclerView.LayoutManager layoutManager = page.getLayoutManager();
+                if (layoutManager instanceof LinearLayoutManager) {
+                    ((LinearLayoutManager) layoutManager).setRecycleChildrenOnDetach(false);
+                }
             }
         }
 
@@ -208,6 +210,10 @@ public abstract class BaseGridPagerAdapter<V> extends BasePagerAdapter<RecyclerV
         }
     }
 
+    /**
+     * 增加/删除/更新列表时 所用的比较器
+     * 默认为 ==
+     */
     protected boolean updateEqualJudge(V v, V v1) {
         return v == v1;
     }
@@ -224,6 +230,11 @@ public abstract class BaseGridPagerAdapter<V> extends BasePagerAdapter<RecyclerV
         return new ArrayList<>(vList.subList(startIndex, endInfoIndex));
     }
 
+    /**
+     * @param pageIndex 第几页索引
+     * @param childIndex 在第几页的位置position
+     * @return 在{@link #getAllData()}中的index
+     */
     public int transToDataListIndex(int pageIndex, int childIndex) {
         if(pageIndex < 0 || childIndex < 0){
             return -1;
@@ -231,8 +242,21 @@ public abstract class BaseGridPagerAdapter<V> extends BasePagerAdapter<RecyclerV
         return pageIndex * getPageContentSize() + childIndex;
     }
 
+    /**
+     * @param pageIndex 第几页索引
+     * @param allDataIndex 在{@link #getAllData()}中的index
+     * @return 在某一页的位置position
+     */
     public int getPageItemPosition(int pageIndex, int allDataIndex){
         return allDataIndex - pageIndex * getPageContentSize();
+    }
+
+    /**
+     * @param allDataIndex 在{@link #getAllData()}中的index
+     * @return 获取所在第几页的索引
+     */
+    public int getPageIndex(int allDataIndex){
+        return allDataIndex / getPageContentSize();
     }
 
     public int getColumn() {

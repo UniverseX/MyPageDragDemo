@@ -1,6 +1,7 @@
 package com.autoai.pagedragframe.drag;
 
 import android.content.Context;
+import android.graphics.Point;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
@@ -18,7 +19,7 @@ public abstract class BaseDragPageAdapter<V> extends BaseGridPagerAdapter<V> imp
     public BaseDragPageAdapter(Context context, int row, int column, List<V> list, DragListenerDispatcher<ViewPager, DragInfo> pagerLisener) {
         super(context, row, column, list);
 
-        mDragManager = new DragManager<>();
+        mDragManager = new MyDragManager();
         pagerLisener.attachDragManager(mDragManager);
 
     }
@@ -43,6 +44,10 @@ public abstract class BaseDragPageAdapter<V> extends BaseGridPagerAdapter<V> imp
         return true;
     }
 
+    public View.DragShadowBuilder getDragShadowBuilder(View view, Point touchPoint){
+        return new NoForegroundShadowBuilder(view, touchPoint);
+    }
+
     @Override
     public void onBindPage(Context context, RecyclerView recyclerView, int pageIndex) {
         super.onBindPage(context, recyclerView, pageIndex);
@@ -51,9 +56,23 @@ public abstract class BaseDragPageAdapter<V> extends BaseGridPagerAdapter<V> imp
     }
 
     @Override
+    public void onUnbindPage(RecyclerView view, int pageIndex) {
+        super.onUnbindPage(view, pageIndex);
+        mDragManager.removeDragListener(pageIndex);
+    }
+
+    @Override
     public void release() {
         super.release();
         mDragManager.clearListeners();
+    }
+
+    class MyDragManager extends DragManager<RecyclerView> {
+
+        @Override
+        public View.DragShadowBuilder getViewShadowBuilder(View view, Point touchPoint) {
+            return getDragShadowBuilder(view, touchPoint);
+        }
     }
 
     public abstract class DragAdapter<VH extends PageViewHolder> extends GridRecycleAdapter<VH> implements DragNotifier {

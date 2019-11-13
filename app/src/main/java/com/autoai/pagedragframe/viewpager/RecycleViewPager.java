@@ -16,15 +16,20 @@ public class RecycleViewPager extends BaseViewPager {
     }
 
     /**
-     * will call recycleView's adapter recycle method
+     * {@link BaseGridPagerAdapter}
      */
     public void release() {
+        PagerAdapter adapter = getAdapter();
+        if(adapter instanceof BasePagerAdapter){
+            ((BasePagerAdapter) adapter).release();
+        }
         removeAllViews();
     }
 
-    public void retore() {
+    public void restore() {
         PagerAdapter adapter = getAdapter();
-        if(adapter != null) {
+        if(adapter instanceof BasePagerAdapter) {
+            ((BasePagerAdapter) adapter).setContext(getContext());
             adapter.notifyDataSetChanged();
         }
     }

@@ -27,7 +27,7 @@
     </LinearLayout>
 
 
-    <com.autoai.pagedragframe.viewpager.MViewPager
+    <com.autoai.pagedragframe.viewpager.RecycleViewPager
         android:id="@+id/vp"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
