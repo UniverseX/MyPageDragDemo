@@ -2,9 +2,14 @@
 
 buildscript {
     repositories {
-        google()
+        maven { url 'https://wdnexus.mapbar.com/content/groups/public' }
+        maven { url 'https://maven.aliyun.com/repository/public' }
+        maven { url 'https://maven.aliyun.com/repository/google' }
+        maven { url 'https://maven.aliyun.com/repository/jcenter' }
+        maven { url 'http://maven.aliyun.com/nexus/content/groups/public' }
         jcenter()
-        
+        mavenCentral()
+        google()
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:3.4.1'
@@ -16,9 +21,13 @@ buildscript {
 
 allprojects {
     repositories {
-        google()
+        maven { url 'https://wdnexus.mapbar.com/content/groups/public' }
+        maven { url 'http://maven.aliyun.com/nexus/content/groups/public' }
+        maven { url 'https://maven.aliyun.com/repository/google' }
+        maven { url 'https://maven.aliyun.com/repository/jcenter' }
         jcenter()
-        
+        mavenCentral()
+        google()
     }
 }
 
