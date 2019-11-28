@@ -24,10 +24,17 @@
             android:layout_width="0dp"
             android:text="删除"
             android:layout_height="wrap_content" />
+
+        <Button
+            android:layout_weight="1"
+            android:onClick="update"
+            android:layout_width="0dp"
+            android:text="更新"
+            android:layout_height="wrap_content" />
     </LinearLayout>
 
 
-    <com.autoai.pagedragframe.viewpager.RecycleViewPager
+    <com.autoai.pagedrag.views.DragViewPager
         android:id="@+id/vp"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
