@@ -104,6 +104,10 @@ public abstract class RecyclerViewPagerAdapter<Data> extends ViewPagerAdapter im
         notifyItemRangeChanged(pageIndex, itemPosition, 1, payload);
     }
 
+    /**
+     * @param payload payload相关连的bean的修改项，不影响itemId，局部刷新才会其作用
+     * @see RecyclerView#getChangedHolderKey(RecyclerView.ViewHolder)
+     */
     public void notifyItemRangeChanged(int pageIndex, int startPosition, int count, Object payload) {
         RecyclerView recycleView = (RecyclerView) views.get(pageIndex).getChildAt(0);
         RecyclerView.Adapter adapter = recycleView.getAdapter();
