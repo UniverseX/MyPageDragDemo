@@ -101,7 +101,6 @@ public abstract class RecyclerViewPagerAdapter<Data> extends ViewPagerAdapter im
 
     @Override
     public void notifyItemChanged(int pageIndex, int itemPosition, Object payload) {
-        Log.d("zxl_test", "RecyclerViewPagerAdapter -- notifyItemChanged: payload = " + payload);
         notifyItemRangeChanged(pageIndex, itemPosition, 1, payload);
     }
 
