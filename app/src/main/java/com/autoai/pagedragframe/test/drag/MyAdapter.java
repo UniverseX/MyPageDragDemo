@@ -45,7 +45,7 @@ public class MyAdapter extends DragPageAdapter<TestBean> {
         }
 
         @Override
-        public void onBindViewHolder(ItemViewHolder holder, int position, List<Object> payloads) {
+        public void onBindItemViewHolder(ItemViewHolder holder, int position, List<Object> payloads) {
             if (payloads != null && !payloads.isEmpty()) {
                 Integer color = (Integer) payloads.get(0);
                 holder.backView.setBackgroundColor(color);

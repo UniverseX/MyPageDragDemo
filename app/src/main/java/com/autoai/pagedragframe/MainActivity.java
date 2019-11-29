@@ -120,18 +120,18 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void insert(View view) {
-        final int pos = colors.size();
-        colors.add(0, new TestBean(color_array[r.nextInt(color_array.length)], pos));
-        pageData.insertData(0, colors.get(pos));
+        final int pos = pageData.getAllData().size();
+        pageData.insertData(0, new TestBean(color_array[r.nextInt(color_array.length)], pos));
     }
 
     public void remove(View view) {
-        TestBean remove = colors.remove(r.nextInt(colors.size()));
+        List<TestBean> allData = pageData.getAllData();
+        TestBean remove = allData.get(r.nextInt(allData.size()));
         pageData.removeData(remove);
     }
 
     public void update(View view) {
-        TestBean testBean = colors.get(1);
+        TestBean testBean = pageData.getAllData().get(1);
 
         int newColor = color_array[r.nextInt(color_array.length)];
         testBean.color = newColor;
