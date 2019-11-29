@@ -155,11 +155,6 @@ public abstract class DragPageAdapter<Data> extends RecyclerViewPagerAdapter<Dat
         public abstract void onBindItemViewHolder(VH holder, int position);
     }
 
-    @Override
-    protected RecyclerView.Adapter generateItemRecyclerAdapter(List<Data> pageData, int pageIndex) {
-        return null;
-    }
-
     @Nullable
     @Override
     public DragRecyclerView getCurrentItem(int position) {
