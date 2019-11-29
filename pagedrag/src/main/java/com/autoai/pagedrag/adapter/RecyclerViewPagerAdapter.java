@@ -3,7 +3,6 @@ package com.autoai.pagedrag.adapter;
 import android.content.Context;
 import android.support.annotation.CallSuper;
 import android.support.annotation.NonNull;
-import android.support.v4.view.ViewPager;
 import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -143,6 +142,18 @@ public abstract class RecyclerViewPagerAdapter<Data> extends ViewPagerAdapter im
         @Override
         public int getItemCount() {
             return data.size();
+        }
+
+        @Override
+        public final void onBindViewHolder(VH holder, int position, List<Object> payloads) {
+            if (payloads.isEmpty()) {
+                super.onBindViewHolder(holder, position, payloads);
+            } else {
+                onBindItemViewHolder(holder, position, payloads);
+            }
+        }
+
+        public void onBindItemViewHolder(VH holder, int position, List<Object> payloads) {
         }
     }
 }
