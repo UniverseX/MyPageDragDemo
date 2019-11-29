@@ -55,8 +55,8 @@ public class PageData<Data> {
         return pageIndex >= mPageData.size() ? new ArrayList<Data>() : mPageData.get(pageIndex);
     }
 
-    public int getAllDataSize() {
-        return allData.size();
+    public List<Data> getAllData() {
+        return allData;
     }
 
     public int getColumn() {
