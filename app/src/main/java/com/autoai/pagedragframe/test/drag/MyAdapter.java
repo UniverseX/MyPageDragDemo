@@ -33,14 +33,12 @@ public class MyAdapter extends DragPageAdapter<TestBean> {
 
         @Override
         public ItemViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            Log.d("zxl_test", "ItemAdapter -- onCreateItemViewHolder: ");
             View inflate = LayoutInflater.from(parent.getContext()).inflate(R.layout.page_item, parent, false);
             return new ItemViewHolder(inflate);
         }
 
         @Override
         public void onBindItemViewHolder(ItemViewHolder holder, int position) {
-            Log.d("zxl_test", "ItemAdapter -- onBindViewHolder: position " + position);
             TestBean testBean = data.get(position);
             holder.backView.setBackgroundColor(testBean.color);
             holder.textView.setText("" + testBean.dataIndex);
@@ -58,7 +56,6 @@ public class MyAdapter extends DragPageAdapter<TestBean> {
                 onBindViewHolder(holder, position);
             }
         }
-
 
         @Override
         public long getStableItemId(int position) {

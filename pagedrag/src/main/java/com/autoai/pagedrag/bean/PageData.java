@@ -130,11 +130,14 @@ public class PageData<Data> {
     public void updateData(Data data, Object payload) {
         if (dataObserver != null) {
             int dataPosition = dataComparator.getDataPosition(allData, data);
-            Log.d("zxl_test", "PageData -- updateData: dataPosition = " + dataPosition);
-            int pageIndex = dataPosition / mPageContentSize;
-            int itemListPosition = dataPosition - pageIndex * mPageContentSize;
+            if (dataPosition >= 0) {
+                int pageIndex = dataPosition / mPageContentSize;
+                int itemListPosition = dataPosition - pageIndex * mPageContentSize;
 
-            dataObserver.notifyItemChanged(pageIndex, itemListPosition, payload);
+                dataObserver.notifyItemChanged(pageIndex, itemListPosition, payload);
+            } else {
+                insertData(-1, data);
+            }
         }
     }
 

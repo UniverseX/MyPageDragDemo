@@ -114,8 +114,6 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public int getDataPosition(List<TestBean> allData, TestBean newData) {
-                Log.d("zxl_test", "MainActivity -- getDataPosition: newData = " + newData);
-                Log.d("zxl_test", "MainActivity -- getDataPosition: pos1Data = " + allData.get(1));
                 return allData.indexOf(newData);
             }
         });
