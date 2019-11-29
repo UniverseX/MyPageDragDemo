@@ -96,7 +96,7 @@ public class MainActivity extends AppCompatActivity {
         for (int i = 0; i < 24; i++) {
             colors.add(new TestBean(color_array[r.nextInt(color_array.length)], i));
         }
-        pageData = new PageData<>(2, 5, colors, new DataComparator<TestBean>() {
+        pageData = new PageData<TestBean>(2, 5, colors){
             @Override
             public boolean areItemsTheSame(TestBean oldData, TestBean newData) {
                 return oldData.hashCode() == newData.hashCode();
@@ -116,7 +116,7 @@ public class MainActivity extends AppCompatActivity {
             public int getDataPosition(List<TestBean> allData, TestBean newData) {
                 return allData.indexOf(newData);
             }
-        });
+        };
     }
 
     public void insert(View view) {
