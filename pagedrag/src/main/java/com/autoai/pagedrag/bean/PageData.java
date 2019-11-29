@@ -75,6 +75,10 @@ public class PageData<Data> {
         this.dataObserver = dataObserver;
     }
 
+    public void insertData(Data data){
+        insertData(-1, data);
+    }
+
     public void insertData(int listPosition, Data data) {
         List<List<Data>> oldPageData = new ArrayList<>(mPageData);
 
@@ -131,12 +135,13 @@ public class PageData<Data> {
         if (dataObserver != null) {
             int dataPosition = dataComparator.getDataPosition(allData, data);
             if (dataPosition >= 0) {
+                Log.d("zxl_test", "PageData -- updateData: dataPosition = " + dataPosition);
                 int pageIndex = dataPosition / mPageContentSize;
                 int itemListPosition = dataPosition - pageIndex * mPageContentSize;
 
                 dataObserver.notifyItemChanged(pageIndex, itemListPosition, payload);
             } else {
-                insertData(-1, data);
+                insertData(data);
             }
         }
     }
@@ -155,7 +160,7 @@ public class PageData<Data> {
 
         final int oldSize = oldPageData.size();
         if (oldSize < pageNum) {
-            for (int i = 0; i < allData.size(); i++) {
+            for (int i = 0; i < pageNum; i++) {
                 if (i < oldSize) {
                     List<Data> newList = mPageData.get(i);
                     dataObserver.notifyPageChanged(i, newList, dataComparator);
