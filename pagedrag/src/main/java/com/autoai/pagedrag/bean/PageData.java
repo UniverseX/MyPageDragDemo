@@ -1,29 +1,26 @@
 package com.autoai.pagedrag.bean;
 
 import android.support.annotation.NonNull;
-import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class PageData<Data> {
+public abstract class PageData<Data> implements DataComparator<Data> {
     private final int mRow;
     private final int mColumn;
     private final int mPageContentSize;//每一页的数量
     private int pageNum;//几个页面
     private List<List<Data>> mPageData = new ArrayList<>();
     private List<Data> allData;
-    private DataComparator<Data> dataComparator;
     private DataObserver<Data> dataObserver;
 
-    public PageData(int row, int column, List<Data> list, DataComparator<Data> dataComparator) {
+    public PageData(int row, int column, List<Data> list) {
         mRow = row;
         mColumn = column;
         mPageContentSize = row * column;
 
         pageNum = getPageNum(list);
         allData = new ArrayList<>(list);
-        this.dataComparator = dataComparator;
 
         //分配data
         updatePagesData();
@@ -75,7 +72,7 @@ public class PageData<Data> {
         this.dataObserver = dataObserver;
     }
 
-    public void insertData(Data data){
+    public void insertData(Data data) {
         insertData(-1, data);
     }
 
@@ -97,7 +94,7 @@ public class PageData<Data> {
         for (int i = 0; i < pageNum; i++) {
             if (i < oldSize) {
                 List<Data> newList = mPageData.get(i);
-                dataObserver.notifyPageChanged(i, newList, dataComparator);
+                dataObserver.notifyPageChanged(i, newList, this);
             } else {
                 dataObserver.notifyPageAdd(i);
             }
@@ -120,7 +117,7 @@ public class PageData<Data> {
         for (int i = 0; i < oldSize; i++) {
             if (i < newSize) {
                 List<Data> newList = mPageData.get(i);
-                dataObserver.notifyPageChanged(i, newList, dataComparator);
+                dataObserver.notifyPageChanged(i, newList, this);
             } else {
                 dataObserver.notifyPageRemoved(i);
             }
@@ -133,9 +130,8 @@ public class PageData<Data> {
      */
     public void updateData(Data data, Object payload) {
         if (dataObserver != null) {
-            int dataPosition = dataComparator.getDataPosition(allData, data);
+            int dataPosition = getDataPosition(allData, data);
             if (dataPosition >= 0) {
-                Log.d("zxl_test", "PageData -- updateData: dataPosition = " + dataPosition);
                 int pageIndex = dataPosition / mPageContentSize;
                 int itemListPosition = dataPosition - pageIndex * mPageContentSize;
 
@@ -163,7 +159,7 @@ public class PageData<Data> {
             for (int i = 0; i < pageNum; i++) {
                 if (i < oldSize) {
                     List<Data> newList = mPageData.get(i);
-                    dataObserver.notifyPageChanged(i, newList, dataComparator);
+                    dataObserver.notifyPageChanged(i, newList, this);
                 } else {
                     dataObserver.notifyPageAdd(i);
                 }
@@ -173,7 +169,7 @@ public class PageData<Data> {
             for (int i = 0; i < oldSize; i++) {
                 if (i < newSize) {
                     List<Data> newList = mPageData.get(i);
-                    dataObserver.notifyPageChanged(i, newList, dataComparator);
+                    dataObserver.notifyPageChanged(i, newList, this);
                 } else {
                     dataObserver.notifyPageRemoved(i);
                 }

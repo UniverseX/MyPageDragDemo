@@ -6,7 +6,6 @@ import android.os.Handler;
 import android.support.annotation.Size;
 import android.support.v4.view.PagerAdapter;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.DragEvent;
 import android.view.View;
 import android.view.ViewConfiguration;
@@ -57,6 +56,9 @@ public class DragViewPager extends RecyclerViewPager<DragViewPager.DragListener>
         this.rightOutZone = rightOutZone;
     }
 
+    /**
+     * @param canPageScrollOnDragging 是否可以跨页拖动
+     */
     public void setCanPageScrollOnDragging(boolean canPageScrollOnDragging) {
         this.canPageScrollOnDragging = canPageScrollOnDragging;
     }
@@ -108,7 +110,7 @@ public class DragViewPager extends RecyclerViewPager<DragViewPager.DragListener>
                     clearScrollRunnable();
                 }
 
-                if(lastDragListener != null && lastDragListener != dragListener){
+                if (lastDragListener != null && lastDragListener != dragListener) {
                     lastDragListener.onDragEnd(v, event, coordinate);
                 }
                 dragListener.onDragEnd(v, event, coordinate);
@@ -146,7 +148,7 @@ public class DragViewPager extends RecyclerViewPager<DragViewPager.DragListener>
                 if (lastDragListener != null) {
                     lastDragListener.onDragExit(v, event, dragListener, direction < 0 ? direction * leftOutZone : direction * rightOutZone, visualCenterCoordinate);
                 }
-                dragListener.onDragEnter(v, event, lastDragListener,  direction < 0 ? direction * leftOutZone : direction * rightOutZone, visualCenterCoordinate);
+                dragListener.onDragEnter(v, event, lastDragListener, direction < 0 ? direction * leftOutZone : direction * rightOutZone, visualCenterCoordinate);
             }
             dragListener.onDragOver(v, event, visualCenterCoordinate);
         } else {
