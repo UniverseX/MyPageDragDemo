@@ -5,7 +5,6 @@ import android.graphics.PointF;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.DragEvent;
 import android.view.MotionEvent;
 import android.view.View;
@@ -143,6 +142,7 @@ public class DragRecyclerView extends RecyclerView implements DragViewPager.Drag
                     //1.获取下一个page与draggingItem坐标最近的item
                     View childViewUnder = findChildViewUnder(coordinate[0] - vectorOutZone, coordinate[1]);//horizontal
                     int lastPosition = recyclerDragListener.getLastAdapterPosition();
+                    int lastPagePosition = lastRecyclerDragListener.getLastAdapterPosition();
                     if (childViewUnder == null) {
                         childViewUnder = DragRecyclerView.this.findViewHolderForAdapterPosition(lastPosition).itemView;
                     }
@@ -155,7 +155,7 @@ public class DragRecyclerView extends RecyclerView implements DragViewPager.Drag
                         //4.new page添加draggingItem
                         recyclerDragListener.addItemToPosition(childAdapterPosition, draggingItem);
                         //5.last page添加新item到adapter中
-                        lastRecyclerDragListener.addItemToPosition(-1, pendingMoveToLast);
+                        lastRecyclerDragListener.addItemToPosition(vectorOutZone < 0 ? 0 : lastPagePosition, pendingMoveToLast);
                     }
                 }
             });
