@@ -9,9 +9,9 @@ public abstract class PageData<Data> implements DataComparator<Data> {
     private final int mRow;
     private final int mColumn;
     private final int mPageContentSize;//每一页的数量
-    private int pageNum;//几个页面
+    protected int pageNum;//几个页面
     private List<List<Data>> mPageData = new ArrayList<>();
-    private List<Data> allData;
+    protected List<Data> allData;
     private DataObserver<Data> dataObserver;
 
     public PageData(int row, int column, List<Data> list) {
@@ -26,7 +26,7 @@ public abstract class PageData<Data> implements DataComparator<Data> {
         updatePagesData();
     }
 
-    private int getPageNum(List<Data> list) {
+    protected int getPageNum(List<Data> list) {
         return list.size() / mPageContentSize + ((list.size() % mPageContentSize == 0) ? 0 : 1);
     }
 
@@ -34,7 +34,7 @@ public abstract class PageData<Data> implements DataComparator<Data> {
         return mPageData.size();
     }
 
-    private void updatePagesData() {
+    protected void updatePagesData() {
         mPageData.clear();
         for (int i = 0; i < pageNum; i++) {
             mPageData.add(getSinglePageData(i));
@@ -174,6 +174,14 @@ public abstract class PageData<Data> implements DataComparator<Data> {
                     dataObserver.notifyPageRemoved(i);
                 }
             }
+        }
+    }
+
+    public void updateAllDataByPage() {
+        allData.clear();
+        int size = mPageData.size();
+        for (int i = 0; i < size; i++) {
+            allData.addAll(mPageData.get(i));
         }
     }
 

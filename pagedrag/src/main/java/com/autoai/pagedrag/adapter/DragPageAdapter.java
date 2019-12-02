@@ -104,6 +104,7 @@ public abstract class DragPageAdapter<Data> extends RecyclerViewPagerAdapter<Dat
                     }
                 }
             });
+            mPageData.updateAllDataByPage();
         }
 
         @Override
