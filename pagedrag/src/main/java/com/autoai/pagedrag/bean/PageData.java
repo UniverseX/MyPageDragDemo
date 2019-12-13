@@ -118,11 +118,9 @@ public abstract class PageData<Data> implements DataComparator<Data> {
             if (i < newSize) {
                 List<Data> newList = mPageData.get(i);
                 dataObserver.notifyPageChanged(i, newList, this);
-            } else {
-                dataObserver.notifyPageRemoved(i);
             }
         }
-
+        dataObserver.notifyPageRemoved(oldSize - newSize);
     }
 
     /**
@@ -170,10 +168,9 @@ public abstract class PageData<Data> implements DataComparator<Data> {
                 if (i < newSize) {
                     List<Data> newList = mPageData.get(i);
                     dataObserver.notifyPageChanged(i, newList, this);
-                } else {
-                    dataObserver.notifyPageRemoved(i);
                 }
             }
+            dataObserver.notifyPageRemoved(oldSize - newSize);
         }
     }
 
@@ -188,7 +185,7 @@ public abstract class PageData<Data> implements DataComparator<Data> {
     public interface DataObserver<Data> {
         void notifyPageAdd(int pageIndex);
 
-        void notifyPageRemoved(int pageIndex);
+        void notifyPageRemoved(int removePageNum);
 
         void notifyItemChanged(int pageIndex, int itemPosition, Object payload);
 

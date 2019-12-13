@@ -93,8 +93,10 @@ public abstract class RecyclerViewPagerAdapter<Data> extends ViewPagerAdapter im
     }
 
     @Override
-    public void notifyPageRemoved(int pageIndex) {
-        views.remove(pageIndex);
+    public void notifyPageRemoved(int removePageNum) {
+        for (int i = 0; i < removePageNum; i++) {
+            views.remove(views.size() - 1);
+        }
         notifyDataSetChanged();
     }
 
