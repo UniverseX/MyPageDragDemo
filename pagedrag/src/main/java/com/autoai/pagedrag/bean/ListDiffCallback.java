@@ -3,16 +3,17 @@ package com.autoai.pagedrag.bean;
 import android.support.annotation.Nullable;
 import android.support.v7.util.DiffUtil;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ListDiffCallback<Data> extends DiffUtil.Callback {
-    private List<Data> oldList;
-    private List<Data> newList;
+    private List<Data> oldList = new ArrayList<>();
+    private List<Data> newList = new ArrayList<>();
     private DataComparator<Data> dataComparator;
 
     public ListDiffCallback(List<Data> oldList, List<Data> newList, DataComparator<Data> dataComparator) {
-        this.oldList = oldList;
-        this.newList = newList;
+        this.oldList.addAll(oldList);
+        this.newList.addAll(newList);
         this.dataComparator = dataComparator;
     }
 

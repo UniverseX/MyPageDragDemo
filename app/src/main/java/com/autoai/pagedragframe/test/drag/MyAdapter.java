@@ -17,18 +17,18 @@ import java.util.List;
 
 public class MyAdapter extends DragPageAdapter<TestBean> {
     public MyAdapter(Context context, PageData<TestBean> pageData) {
-        super(context, pageData);
+        super(context, pageData, true);
     }
 
     @Override
     public ItemAdapter generateItemRecyclerAdapter(List<TestBean> pageData, int pageIndex) {
-        return new ItemAdapter(pageData);
+        return new ItemAdapter(pageData, pageIndex);
     }
 
     private class ItemAdapter extends ItemDragAdapter<ItemViewHolder> {
 
-        ItemAdapter(List<TestBean> list) {
-            super(list);
+        ItemAdapter(List<TestBean> list, int pageIndex) {
+            super(list, pageIndex);
         }
 
         @Override

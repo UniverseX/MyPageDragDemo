@@ -182,6 +182,55 @@ public abstract class PageData<Data> implements DataComparator<Data> {
         }
     }
 
+    public void onMove(int pageIndex, int fromPosition, int toPosition){
+        //按顺序交换，不直接交换,do not use Collections.swap, ensure the order
+        List<Data> data = mPageData.get(pageIndex);
+        List<Data> newData = new ArrayList<>(data);
+        Data removeItem = newData.remove(fromPosition);
+        newData.add(toPosition, removeItem);
+        //update adapter and UI
+        if (dataObserver != null) {
+            dataObserver.notifyPageChanged(pageIndex, newData, this);
+        }
+        //update local
+        data.clear();
+        data.addAll(newData);
+    }
+
+    public Data removePosition(int pageIndex, int position) {
+        Data item = null;
+        if (position >= 0) {
+            List<Data> data = mPageData.get(pageIndex);
+            List<Data> newData = new ArrayList<>(data);
+            item = newData.remove(position);
+            //update adapter and UI
+            if (dataObserver != null) {
+                dataObserver.notifyPageChanged(pageIndex, newData, this);
+            }
+            //update local
+            data.clear();
+            data.addAll(newData);
+        }
+        return item;
+    }
+
+    public void addItemToPosition(int pageIndex, int position, Data object) {
+        List<Data> data = mPageData.get(pageIndex);
+        List<Data> newData = new ArrayList<>(data);
+        if (position < 0) {
+            newData.add(object);
+        } else {
+            newData.add(position, object);
+        }
+        //update adapter and UI
+        if (dataObserver != null) {
+            dataObserver.notifyPageChanged(pageIndex, newData, this);
+        }
+        //update local
+        data.clear();
+        data.addAll(newData);
+    }
+
     public interface DataObserver<Data> {
         void notifyPageAdd(int pageIndex);
 

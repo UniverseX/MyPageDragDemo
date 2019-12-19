@@ -20,8 +20,8 @@ import com.autoai.pagedrag.views.DragViewPager;
 import java.util.List;
 
 public abstract class DragPageAdapter<Data> extends RecyclerViewPagerAdapter<Data> implements ViewPagerHelper<DragViewPager.DragListener> {
-    public DragPageAdapter(Context context, PageData<Data> pageData) {
-        super(context, pageData);
+    public DragPageAdapter(Context context, PageData<Data> pageData, boolean initViewsImmediately) {
+        super(context, pageData, initViewsImmediately);
     }
 
     @NonNull
@@ -41,8 +41,8 @@ public abstract class DragPageAdapter<Data> extends RecyclerViewPagerAdapter<Dat
     public abstract class ItemDragAdapter<VH extends DragViewHolder> extends ItemPageAdapter<VH> implements DragRecyclerView.RecyclerDragListener<Data> {
         private long draggingItemId = RecyclerView.NO_ID;
 
-        public ItemDragAdapter(List<Data> list) {
-            super(list);
+        public ItemDragAdapter(List<Data> list, int pageIndex) {
+            super(list, pageIndex);
             setHasStableIds(true);
         }
 
@@ -115,32 +115,17 @@ public abstract class DragPageAdapter<Data> extends RecyclerViewPagerAdapter<Dat
             if (fromPosition == toPosition) {
                 return;
             }
-            //按顺序交换，不直接交换,do not use Collections.swap, ensure the order
-            Data removeItem = data.remove(fromPosition);
-            data.add(toPosition, removeItem);
-
-            notifyItemMoved(fromPosition, toPosition);
+            mPageData.onMove(pageIndex, fromPosition, toPosition);
         }
 
         @Override
         public Data removePosition(int position) {
-            Data item = null;
-            if (position >= 0) {
-                item = data.remove(position);
-            }
-            notifyItemRemoved(position);
-            return item;
+            return mPageData.removePosition(pageIndex, position);
         }
 
         @Override
         public void addItemToPosition(int position, Data object) {
-            if (position < 0) {
-                data.add(object);
-                notifyItemInserted(data.size() - 1);
-            } else {
-                data.add(position, object);
-                notifyItemInserted(position);
-            }
+            mPageData.addItemToPosition(pageIndex, position, object);
         }
 
         @Override

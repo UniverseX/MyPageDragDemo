@@ -3,6 +3,7 @@ package com.autoai.pagedrag.bean;
 import android.graphics.Point;
 import android.os.Parcel;
 import android.os.Parcelable;
+
 import static android.support.v7.widget.RecyclerView.NO_ID;
 
 public class DragInfo implements Parcelable {

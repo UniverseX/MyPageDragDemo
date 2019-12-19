@@ -15,11 +15,12 @@ public class ScaleViewShadowBuilder extends DragSortShadowBuilder {
     private final Matrix matrix = new Matrix();
     private float sx = 1;
     private float sy = 1;
+
     public ScaleViewShadowBuilder(View view, Point touchPoint) {
         super(view, touchPoint);
     }
 
-    public void setScale(float sx, float sy){
+    public void setScale(float sx, float sy) {
         this.sx = sx;
         this.sy = sy;
     }
@@ -35,16 +36,17 @@ public class ScaleViewShadowBuilder extends DragSortShadowBuilder {
             Log.e(TAG, "Asked for drag thumb metrics but no view");
         }
     }
+
     @Override
     public void onDrawShadow(@NonNull Canvas canvas) {
         View view = getView();
-        if(view != null){
+        if (view != null) {
             float pw = view.getWidth() * this.sx / 2f;
             float ph = view.getHeight() * this.sy / 2f;
             matrix.setScale(sx, sy, pw, ph);
             canvas.setMatrix(matrix);
             view.draw(canvas);
-        }else {
+        } else {
             Log.e(TAG, "Asked to draw drag shadow but no view");
         }
     }

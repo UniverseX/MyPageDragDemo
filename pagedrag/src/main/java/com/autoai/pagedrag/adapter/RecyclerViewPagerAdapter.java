@@ -25,15 +25,15 @@ public abstract class RecyclerViewPagerAdapter<Data> extends ViewPagerAdapter im
     protected PageData<Data> mPageData;
     private Context mContext;
 
-    public RecyclerViewPagerAdapter(Context context, PageData<Data> pageData) {
+    public RecyclerViewPagerAdapter(Context context, PageData<Data> pageData, boolean initViewsImmediately) {
         mContext = context;
         mPageData = pageData;
         mPageData.setDataObserver(this);
 
-        initViewFromPageData(context);
+        if(initViewsImmediately) initViewFromPageData(context);
     }
 
-    private void initViewFromPageData(Context context) {
+    protected void initViewFromPageData(Context context) {
         int pageNum = mPageData.getPageNum();
 
         for (int i = 0; i < pageNum; i++) {
@@ -128,9 +128,11 @@ public abstract class RecyclerViewPagerAdapter<Data> extends ViewPagerAdapter im
 
     public abstract class ItemPageAdapter<VH extends RecyclerView.ViewHolder> extends RecyclerView.Adapter<VH> {
         protected List<Data> data;
+        protected int pageIndex;
 
-        public ItemPageAdapter(List<Data> list) {
+        public ItemPageAdapter(List<Data> list, int pageIndex) {
             this.data = list;
+            this.pageIndex = pageIndex;
         }
 
         public void updateData(List<Data> newList, DataComparator<Data> dataComparator) {
