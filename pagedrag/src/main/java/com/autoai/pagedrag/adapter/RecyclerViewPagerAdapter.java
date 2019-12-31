@@ -117,12 +117,23 @@ public abstract class RecyclerViewPagerAdapter<Data> extends ViewPagerAdapter im
         }
     }
 
+    /**
+     * 增量刷新整个页面
+     */
+    public void notifyPageChanged(int pageIndex, Object payload) {
+        RecyclerView recycleView = (RecyclerView) views.get(pageIndex).getChildAt(0);
+        RecyclerView.Adapter adapter = recycleView.getAdapter();
+        if (adapter != null) {
+            adapter.notifyItemRangeChanged(0, adapter.getItemCount(), payload);
+        }
+    }
+
     @Override
     public void notifyPageChanged(int pageIndex, List<Data> newList, DataComparator<Data> dataComparator) {
         RecyclerView recycleView = (RecyclerView) views.get(pageIndex).getChildAt(0);
         RecyclerView.Adapter adapter = recycleView.getAdapter();
-        if (adapter instanceof DragPageAdapter.ItemDragAdapter) {
-            ((DragPageAdapter.ItemDragAdapter) adapter).updateData(newList, dataComparator);
+        if (adapter instanceof ItemPageAdapter) {
+            ((ItemPageAdapter) adapter).updateData(newList, dataComparator);
         }
     }
 
